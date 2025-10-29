@@ -6,13 +6,13 @@ import {
   SOCKET_STATES,
 } from "@deepgram/sdk";
 import { useEffect, useRef, useState } from "react";
-import { useDeepgram } from "../context/DeepgramContextProvider";
+import { useDeepgram } from "../context/deepgram-context-provider";
 import {
   MicrophoneEvents,
   MicrophoneState,
   useMicrophone,
-} from "../context/MicrophoneContextProvider";
-import Visualizer from "./Visualizer";
+} from "../context/microphone-context-provider";
+import Visualizer from "./visualizer";
 
 const App: React.FC = () => {
   const [caption, setCaption] = useState<string | undefined>();

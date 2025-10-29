@@ -1,12 +1,12 @@
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { DeepgramContextProvider } from "../context/DeepgramContextProvider";
-import { MicrophoneContextProvider } from "../context/MicrophoneContextProvider";
+import { DeepgramContextProvider } from "../context/deepgram-context-provider";
+import { MicrophoneContextProvider } from "../context/microphone-context-provider";
 
 import "@/styles/globals.css";
 
 import type { Metadata, Viewport } from "next";
-import { ThemeProvider } from "@/context/ThemeProvider";
+import { ThemeProvider } from "@/context/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

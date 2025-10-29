@@ -1,7 +1,7 @@
 "use client";
 
 import { ModeToggle } from "@/components/mode-toggle";
-import App from "../components/App";
+import App from "../components/app";
 
 const Home = () => {
   const title = "Deepgram AI";

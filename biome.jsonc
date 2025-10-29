@@ -4,8 +4,7 @@
   "linter": {
     "rules": {
       "style": {
-        "noMagicNumbers": "off",
-        "useFilenamingConvention": "off"
+        "noMagicNumbers": "off"
       },
       "a11y": {
         "noSvgWithoutTitle": "off"
