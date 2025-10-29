@@ -133,7 +133,12 @@ const App: React.FC = () => {
     <div className="flex h-[calc(100svh-theme(spacing.16))] w-full flex-row overflow-x-hidden">
       <div className="flex h-full flex-auto flex-col">
         <div className="relative h-full w-full">
-          {microphone && <Visualizer microphone={microphone} />}
+          {microphone && (
+            <Visualizer
+              isActive={microphoneState === MicrophoneState.Open}
+              microphone={microphone}
+            />
+          )}
           <div className="absolute inset-x-0 bottom-0 flex h-16 w-full items-center justify-center border-t bg-muted text-center text-muted-foreground transition-opacity duration-300 empty:opacity-0">
             {caption && <span className="rounded-xl">{caption}</span>}
           </div>

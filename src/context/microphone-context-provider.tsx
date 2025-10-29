@@ -71,6 +71,28 @@ const MicrophoneContextProvider: React.FC<MicrophoneContextProviderProps> = ({
 
       const newMicrophone = new MediaRecorder(userMedia);
 
+      const handleOpen = () => {
+        setMicrophoneState(MicrophoneState.Open);
+      };
+
+      const handlePause = () => {
+        setMicrophoneState(MicrophoneState.Paused);
+      };
+
+      const handleStop = () => {
+        setMicrophoneState(MicrophoneState.Ready);
+      };
+
+      const handleError = () => {
+        setMicrophoneState(MicrophoneState.Error);
+      };
+
+      newMicrophone.addEventListener(MicrophoneEvents.Start, handleOpen);
+      newMicrophone.addEventListener(MicrophoneEvents.Resume, handleOpen);
+      newMicrophone.addEventListener(MicrophoneEvents.Pause, handlePause);
+      newMicrophone.addEventListener(MicrophoneEvents.Stop, handleStop);
+      newMicrophone.addEventListener(MicrophoneEvents.Error, handleError);
+
       setMicrophoneState(MicrophoneState.Ready);
       setMicrophone(newMicrophone);
     } catch (err: unknown) {
@@ -80,24 +102,45 @@ const MicrophoneContextProvider: React.FC<MicrophoneContextProviderProps> = ({
   };
 
   const stopMicrophone = useCallback(() => {
+    if (!microphone) {
+      return;
+    }
+
+    if (microphone.state !== "recording") {
+      return;
+    }
+
     setMicrophoneState(MicrophoneState.Pausing);
 
-    if (microphone?.state === "recording") {
+    try {
       microphone.pause();
-      setMicrophoneState(MicrophoneState.Paused);
+    } catch (err: unknown) {
+      setMicrophoneState(MicrophoneState.Error);
+      throw err;
     }
   }, [microphone]);
 
   const startMicrophone = useCallback(() => {
-    setMicrophoneState(MicrophoneState.Opening);
-
-    if (microphone?.state === "paused") {
-      microphone.resume();
-    } else {
-      microphone?.start(250);
+    if (!microphone) {
+      return;
     }
 
-    setMicrophoneState(MicrophoneState.Open);
+    if (microphone.state === "recording") {
+      return;
+    }
+
+    setMicrophoneState(MicrophoneState.Opening);
+
+    try {
+      if (microphone.state === "paused") {
+        microphone.resume();
+      } else {
+        microphone.start(250);
+      }
+    } catch (err: unknown) {
+      setMicrophoneState(MicrophoneState.Error);
+      throw err;
+    }
   }, [microphone]);
 
   return (

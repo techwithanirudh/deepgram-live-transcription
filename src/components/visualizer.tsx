@@ -14,7 +14,13 @@ const interpolateColor = (
   return result;
 };
 
-const Visualizer = ({ microphone }: { microphone: MediaRecorder }) => {
+const Visualizer = ({
+  microphone,
+  isActive,
+}: {
+  microphone: MediaRecorder;
+  isActive: boolean;
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const AudioContextCtor =
     typeof window === "undefined"
@@ -28,13 +34,28 @@ const Visualizer = ({ microphone }: { microphone: MediaRecorder }) => {
   const audioContext = new AudioContextCtor();
   const analyser = audioContext.createAnalyser();
   const dataArray = new Uint8Array(analyser.frequencyBinCount);
+  const animationFrameRef = useRef<number | null>(null);
+  const isActiveRef = useRef(isActive);
+
+  useEffect(() => {
+    isActiveRef.current = isActive;
+  }, [isActive]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
     const source = audioContext.createMediaStreamSource(microphone.stream);
     source.connect(analyser);
 
-    draw();
+    animationFrameRef.current = requestAnimationFrame(draw);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+
+      source.disconnect();
+    };
   }, []);
 
   const draw = (): void => {
@@ -53,9 +74,9 @@ const Visualizer = ({ microphone }: { microphone: MediaRecorder }) => {
     const width = canvas.width;
     const height = canvas.height;
 
-    requestAnimationFrame(draw);
-
-    analyser.getByteFrequencyData(dataArray);
+    if (isActiveRef.current) {
+      analyser.getByteFrequencyData(dataArray);
+    }
 
     if (!context) {
       return;
@@ -79,6 +100,8 @@ const Visualizer = ({ microphone }: { microphone: MediaRecorder }) => {
       context.fillRect(x, height - barHeight, barWidth, barHeight);
       x += barWidth;
     }
+
+    animationFrameRef.current = requestAnimationFrame(draw);
   };
 
   return <canvas ref={canvasRef} width={window.innerWidth} />;
