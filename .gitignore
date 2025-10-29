@@ -43,8 +43,5 @@ next-env.d.ts
 # vscode
 .vscode
 
-# container
-.devcontainer
-
 # pycharm
 .idea
