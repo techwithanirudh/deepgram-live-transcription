@@ -5,8 +5,8 @@ const interpolateColor = (
   endColor: number[],
   factor: number
 ): number[] => {
-  const result = [];
-  for (let i = 0; i < startColor.length; i++) {
+  const result: number[] = [];
+  for (let i = 0; i < startColor.length; i += 1) {
     result[i] = Math.round(
       startColor[i] + factor * (endColor[i] - startColor[i])
     );
@@ -16,7 +16,16 @@ const interpolateColor = (
 
 const Visualizer = ({ microphone }: { microphone: MediaRecorder }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const AudioContextCtor =
+    typeof window === "undefined"
+      ? undefined
+      : (window.AudioContext ?? window.webkitAudioContext);
+
+  if (!AudioContextCtor) {
+    throw new Error("AudioContext is not supported in this environment.");
+  }
+
+  const audioContext = new AudioContextCtor();
   const analyser = audioContext.createAnalyser();
   const dataArray = new Uint8Array(analyser.frequencyBinCount);
 

@@ -13,28 +13,34 @@ type MicrophoneContextType = {
   startMicrophone: () => void;
   stopMicrophone: () => void;
   setupMicrophone: () => void;
-  microphoneState: MicrophoneState | null;
+  microphoneState: MicrophoneStateValue | null;
 };
 
-export enum MicrophoneEvents {
-  DataAvailable = "dataavailable",
-  Error = "error",
-  Pause = "pause",
-  Resume = "resume",
-  Start = "start",
-  Stop = "stop",
-}
+export const MicrophoneEvents = {
+  DataAvailable: "dataavailable",
+  Error: "error",
+  Pause: "pause",
+  Resume: "resume",
+  Start: "start",
+  Stop: "stop",
+} as const;
 
-export enum MicrophoneState {
-  NotSetup = -1,
-  SettingUp = 0,
-  Ready = 1,
-  Opening = 2,
-  Open = 3,
-  Error = 4,
-  Pausing = 5,
-  Paused = 6,
-}
+export type MicrophoneEvent =
+  (typeof MicrophoneEvents)[keyof typeof MicrophoneEvents];
+
+export const MicrophoneState = {
+  NotSetup: -1,
+  SettingUp: 0,
+  Ready: 1,
+  Opening: 2,
+  Open: 3,
+  Error: 4,
+  Pausing: 5,
+  Paused: 6,
+} as const;
+
+export type MicrophoneStateValue =
+  (typeof MicrophoneState)[keyof typeof MicrophoneState];
 
 const MicrophoneContext = createContext<MicrophoneContextType | undefined>(
   undefined
@@ -47,7 +53,7 @@ type MicrophoneContextProviderProps = {
 const MicrophoneContextProvider: React.FC<MicrophoneContextProviderProps> = ({
   children,
 }) => {
-  const [microphoneState, setMicrophoneState] = useState<MicrophoneState>(
+  const [microphoneState, setMicrophoneState] = useState<MicrophoneStateValue>(
     MicrophoneState.NotSetup
   );
   const [microphone, setMicrophone] = useState<MediaRecorder | null>(null);
@@ -68,8 +74,7 @@ const MicrophoneContextProvider: React.FC<MicrophoneContextProviderProps> = ({
       setMicrophoneState(MicrophoneState.Ready);
       setMicrophone(newMicrophone);
     } catch (err: unknown) {
-      console.error(err);
-
+      setMicrophoneState(MicrophoneState.Error);
       throw err;
     }
   };

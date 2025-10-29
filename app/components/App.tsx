@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import {
-  LiveConnectionState,
   type LiveTranscriptionEvent,
   LiveTranscriptionEvents,
-  useDeepgram,
-} from "../context/DeepgramContextProvider";
+  SOCKET_STATES,
+} from "@deepgram/sdk";
+import { useEffect, useRef, useState } from "react";
+import { useDeepgram } from "../context/DeepgramContextProvider";
 import {
   MicrophoneEvents,
   MicrophoneState,
@@ -14,15 +14,15 @@ import {
 } from "../context/MicrophoneContextProvider";
 import Visualizer from "./Visualizer";
 
-const App = () => {
+const App: React.FC = () => {
   const [caption, setCaption] = useState<string | undefined>(
     "Powered by Deepgram"
   );
   const { connection, connectToDeepgram, connectionState } = useDeepgram();
   const { setupMicrophone, microphone, startMicrophone, microphoneState } =
     useMicrophone();
-  const captionTimeout = useRef<unknown | null>(null);
-  const keepAliveInterval = useRef<unknown | null>(null);
+  const captionTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const keepAliveInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
@@ -68,15 +68,17 @@ const App = () => {
       }
 
       if (isFinal && speechFinal) {
-        clearTimeout(captionTimeout.current);
+        if (captionTimeout.current) {
+          clearTimeout(captionTimeout.current);
+        }
         captionTimeout.current = setTimeout(() => {
           setCaption(undefined);
-          clearTimeout(captionTimeout.current);
+          captionTimeout.current = null;
         }, 3000);
       }
     };
 
-    if (connectionState === LiveConnectionState.OPEN) {
+    if (connectionState === SOCKET_STATES.open) {
       connection.addListener(LiveTranscriptionEvents.Transcript, onTranscript);
       microphone.addEventListener(MicrophoneEvents.DataAvailable, onData);
 
@@ -90,7 +92,10 @@ const App = () => {
         onTranscript
       );
       microphone.removeEventListener(MicrophoneEvents.DataAvailable, onData);
-      clearTimeout(captionTimeout.current);
+      if (captionTimeout.current) {
+        clearTimeout(captionTimeout.current);
+        captionTimeout.current = null;
+      }
     };
   }, [connectionState]);
 
@@ -102,19 +107,27 @@ const App = () => {
 
     if (
       microphoneState !== MicrophoneState.Open &&
-      connectionState === LiveConnectionState.OPEN
+      connectionState === SOCKET_STATES.open
     ) {
       connection.keepAlive();
+
+      if (keepAliveInterval.current) {
+        clearInterval(keepAliveInterval.current);
+      }
 
       keepAliveInterval.current = setInterval(() => {
         connection.keepAlive();
       }, 10_000);
-    } else {
+    } else if (keepAliveInterval.current) {
       clearInterval(keepAliveInterval.current);
+      keepAliveInterval.current = null;
     }
 
     return () => {
-      clearInterval(keepAliveInterval.current);
+      if (keepAliveInterval.current) {
+        clearInterval(keepAliveInterval.current);
+        keepAliveInterval.current = null;
+      }
     };
   }, [microphoneState, connectionState]);
 

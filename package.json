@@ -8,7 +8,8 @@
     "start": "next start",
     "check": "ultracite check",
     "check:fix": "ultracite fix",
-    "check:unsafe": "ultracite fix --unsafe"
+    "check:unsafe": "ultracite fix --unsafe",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@deepgram/sdk": "^4.5.1",
@@ -17,7 +18,6 @@
     "react": "19.2.0",
     "react-device-detect": "^2.2.3",
     "react-dom": "19.2.0",
-    "react-github-btn": "^1.4.0",
     "react-syntax-highlighter": "^15.5.0"
   },
   "devDependencies": {

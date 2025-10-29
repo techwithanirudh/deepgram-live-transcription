@@ -1,7 +1,6 @@
 pre-commit:
   jobs:
-    check:
-      run: bun x ultracite fix
+    - run: bun x ultracite fix
       glob: 
         - "*.js"
         - "*.jsx"
@@ -11,15 +10,12 @@ pre-commit:
         - "*.jsonc"
         - "*.css"
       stage_fixed: true
-    typecheck:
-      run: bun typecheck
+    - run: bun typecheck
 
 post-merge:
-  commands:
-    install-deps:
-      run: bun i
+  jobs:
+    - run: bun i
 
 commit-msg:
-  commands:
-    'lint commit message':
-      run: bun commitlint --edit {1}
+  jobs:
+    - run: bun commitlint --edit $1
