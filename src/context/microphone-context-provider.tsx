@@ -10,7 +10,7 @@ import {
 
 type MicrophoneContextType = {
   microphone: MediaRecorder | null;
-  startMicrophone: () => void;
+  startMicrophone: (options?: StartMicrophoneOptions) => void;
   stopMicrophone: () => void;
   setupMicrophone: () => void;
   microphoneState: MicrophoneStateValue | null;
@@ -41,6 +41,10 @@ export const MicrophoneState = {
 
 export type MicrophoneStateValue =
   (typeof MicrophoneState)[keyof typeof MicrophoneState];
+
+type StartMicrophoneOptions = {
+  skipStart?: boolean;
+};
 
 const MicrophoneContext = createContext<MicrophoneContextType | undefined>(
   undefined
@@ -106,42 +110,50 @@ const MicrophoneContextProvider: React.FC<MicrophoneContextProviderProps> = ({
       return;
     }
 
-    if (microphone.state !== "recording") {
+    if (microphone.state === "inactive") {
+      setMicrophoneState(MicrophoneState.Ready);
       return;
     }
 
     setMicrophoneState(MicrophoneState.Pausing);
 
     try {
-      microphone.pause();
+      microphone.stop();
     } catch (err: unknown) {
       setMicrophoneState(MicrophoneState.Error);
       throw err;
     }
   }, [microphone]);
 
-  const startMicrophone = useCallback(() => {
-    if (!microphone) {
-      return;
-    }
-
-    if (microphone.state === "recording") {
-      return;
-    }
-
-    setMicrophoneState(MicrophoneState.Opening);
-
-    try {
-      if (microphone.state === "paused") {
-        microphone.resume();
-      } else {
-        microphone.start(250);
+  const startMicrophone = useCallback(
+    (options?: StartMicrophoneOptions) => {
+      if (!microphone) {
+        return;
       }
-    } catch (err: unknown) {
-      setMicrophoneState(MicrophoneState.Error);
-      throw err;
-    }
-  }, [microphone]);
+
+      if (microphone.state === "recording") {
+        return;
+      }
+
+      setMicrophoneState(MicrophoneState.Opening);
+
+      if (options?.skipStart) {
+        return;
+      }
+
+      try {
+        if (microphone.state === "paused") {
+          microphone.resume();
+        } else {
+          microphone.start(250);
+        }
+      } catch (err: unknown) {
+        setMicrophoneState(MicrophoneState.Error);
+        throw err;
+      }
+    },
+    [microphone]
+  );
 
   return (
     <MicrophoneContext.Provider

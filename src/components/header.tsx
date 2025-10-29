@@ -1,8 +1,11 @@
 "use client";
 
+import { SOCKET_STATES } from "@deepgram/sdk";
 import { useMemo } from "react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
+import { DEFAULT_DEEPGRAM_OPTIONS } from "@/config/deepgram";
+import { useDeepgram } from "@/context/deepgram-context-provider";
 import {
   MicrophoneState,
   type MicrophoneStateValue,
@@ -31,6 +34,8 @@ const makeLabel = (state: MicrophoneStateValue | null): string => {
 
 function Header({ title }: { title: string }) {
   const { microphoneState, startMicrophone, stopMicrophone } = useMicrophone();
+  const { connectionState, connectToDeepgram, disconnectFromDeepgram } =
+    useDeepgram();
 
   const isActive =
     microphoneState === MicrophoneState.Open ||
@@ -46,11 +51,33 @@ function Header({ title }: { title: string }) {
 
   const label = useMemo(() => makeLabel(microphoneState), [microphoneState]);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (isActive) {
       stopMicrophone();
-    } else {
+      disconnectFromDeepgram();
+      return;
+    }
+
+    if (connectionState === SOCKET_STATES.open) {
       startMicrophone();
+      return;
+    }
+
+    startMicrophone({ skipStart: true });
+
+    if (
+      connectionState === SOCKET_STATES.connecting ||
+      connectionState === SOCKET_STATES.closing
+    ) {
+      return;
+    }
+
+    try {
+      await connectToDeepgram(DEFAULT_DEEPGRAM_OPTIONS);
+    } catch (err) {
+      stopMicrophone();
+      // biome-ignore lint/suspicious/noConsole: we want to log the error
+      console.error("Failed to start transcription", err);
     }
   };
 

@@ -16,7 +16,7 @@ import Visualizer from "./visualizer";
 
 const App: React.FC = () => {
   const [caption, setCaption] = useState<string | undefined>();
-  const { connection, connectToDeepgram, connectionState } = useDeepgram();
+  const { connection, connectionState } = useDeepgram();
   const { setupMicrophone, microphone, startMicrophone, microphoneState } =
     useMicrophone();
   const captionTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -26,19 +26,6 @@ const App: React.FC = () => {
   useEffect(() => {
     setupMicrophone();
   }, []);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
-  useEffect(() => {
-    if (microphoneState === MicrophoneState.Ready) {
-      connectToDeepgram({
-        model: "nova-3",
-        interim_results: true,
-        smart_format: true,
-        filler_words: true,
-        utterance_end_ms: 3000,
-      });
-    }
-  }, [microphoneState]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
@@ -52,7 +39,7 @@ const App: React.FC = () => {
     const onData = (e: BlobEvent) => {
       // iOS SAFARI FIX:
       // Prevent packetZero from being sent. If sent at size 0, the connection will close.
-      if (e.data.size > 0) {
+      if (e.data.size > 0 && connectionState === SOCKET_STATES.open) {
         connection?.send(e.data);
       }
     };
@@ -97,29 +84,31 @@ const App: React.FC = () => {
     };
   }, [connectionState]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
     if (!connection) {
       return;
     }
 
     if (
-      microphoneState !== MicrophoneState.Open &&
-      connectionState === SOCKET_STATES.open
+      connectionState !== SOCKET_STATES.open ||
+      microphoneState !== MicrophoneState.Open
     ) {
-      connection.keepAlive();
-
       if (keepAliveInterval.current) {
         clearInterval(keepAliveInterval.current);
+        keepAliveInterval.current = null;
       }
-
-      keepAliveInterval.current = setInterval(() => {
-        connection.keepAlive();
-      }, 10_000);
-    } else if (keepAliveInterval.current) {
-      clearInterval(keepAliveInterval.current);
-      keepAliveInterval.current = null;
+      return;
     }
+
+    connection.keepAlive();
+
+    if (keepAliveInterval.current) {
+      clearInterval(keepAliveInterval.current);
+    }
+
+    keepAliveInterval.current = setInterval(() => {
+      connection.keepAlive();
+    }, 10_000);
 
     return () => {
       if (keepAliveInterval.current) {
@@ -127,7 +116,7 @@ const App: React.FC = () => {
         keepAliveInterval.current = null;
       }
     };
-  }, [microphoneState, connectionState]);
+  }, [microphoneState, connectionState, connection]);
 
   return (
     <div className="flex h-[calc(100svh-theme(spacing.16))] w-full flex-row overflow-x-hidden">
