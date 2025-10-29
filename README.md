@@ -1,76 +1,44 @@
 # Next.js Live Transcription Starter
 
-[![Discord](https://dcbadge.vercel.app/api/server/xWRaCDBtW4?style=flat)](https://discord.gg/xWRaCDBtW4)
+Simple Next.js demo that streams mic audio to Deepgram and renders live transcripts in the browser.
 
-The purpose of this demo is to showcase how you can build a NextJS speech to text app using [Deepgram](https://deepgram.com/).
+## Prerequisites
 
-## Live Demo
-You can see the demo in action on Vercel: https://nextjs-live-transcription.vercel.app/
+- Node.js 20+
+- Bun 1.2+ (or another Node package manager)
+- Deepgram API key
 
-## Demo features
-
-Capture streaming audio using [Deepgram Streaming Speech to Text](https://developers.deepgram.com/docs/getting-started-with-live-streaming-audio).
-
-## What is Deepgram?
-
-[Deepgram’s](https://deepgram.com/) voice AI platform provides APIs for speech-to-text, text-to-speech, and full speech-to-speech voice agents. Over 200,000+ developers use Deepgram to build voice AI products and features.
-
-## Sign-up to Deepgram
+## Setup
 
 Want to start building using this project? [Sign-up now for Deepgram and create an API key](https://console.deepgram.com/signup?jump=keys).
 
-## Quickstart
+1. Clone the repository and move into the project directory.
+2. Install dependencies:
+   ```bash
+   bun install
+   ```
+3. Create an environment file and set the required values:
+   ```bash
+   cp .env.example .env
+   # edit .env and set:
+   #   DEEPGRAM_API_KEY=<your key>
+   #   NEXT_PUBLIC_BASE_URL=http://localhost:3000  # adjust if needed
+   ```
 
-### Manual
+## Run Locally
 
-Follow these steps to get started with this starter application.
+- Start the development server: `bun run dev`
+- Open `http://localhost:3000`, allow microphone access, and speak to see live transcription.
 
-#### Clone the repository
+## Production Build
 
-Go to GitHub and [clone the repository](https://github.com/deepgram-starters/nextjs-live-transcription).
+- Build optimized assets: `bun run build`
+- Launch the production server: `bun run start`
 
-#### Install dependencies
+## Troubleshooting
 
-Install the project dependencies.
-
-```bash
-npm install
-```
-
-#### Edit the config file
-
-Copy the code from `sample.env.local` and create a new file called `.env.local`.
-
-```bash
-DEEPGRAM_API_KEY=YOUR-DG-API-KEY
-```
-
-For `DEEPGRAM_API_KEY` paste in the key you generated in the [Deepgram console](https://console.deepgram.com/).
-
-#### Run the application
-
-Once running, you can [access the application in your browser](http://localhost:3000).
-
-```bash
-npm run dev
-```
-
-## Issue Reporting
-
-If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Security Policy](./SECURITY.md) details the procedure for contacting Deepgram.
-
-
-## Getting Help
-
-We love to hear from you so if you have questions, comments or find a bug in the project, let us know! You can either:
-
-- [Open an issue in this repository](https://github.com/deepgram-starters/nextjs-live-transcription/issues)
-- [Join the Deepgram Github Discussions Community](https://github.com/orgs/deepgram/discussions)
-- [Join the Deepgram Discord Community](https://discord.gg/xWRaCDBtW4)
-
-## Author
-
-[Deepgram](https://deepgram.com)
+- Missing transcripts usually mean the API key is unset or invalid. Confirm `DEEPGRAM_API_KEY` is present in `.env`.
+- If Bun is unavailable, install dependencies with `npm install` (or `pnpm install`) and replace `bun run` with the matching package manager command.
 
 ## License
 
