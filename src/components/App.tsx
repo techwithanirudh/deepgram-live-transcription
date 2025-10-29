@@ -138,7 +138,7 @@ const App: React.FC = () => {
           {/* height 100% minus 8rem */}
           <div className="relative h-full w-full">
             {microphone && <Visualizer microphone={microphone} />}
-            <div className="absolute inset-x-0 bottom-[8rem] mx-auto max-w-4xl text-center">
+            <div className="absolute inset-x-0 bottom-32 mx-auto max-w-4xl text-center">
               {caption && <span className="bg-black/70 p-8">{caption}</span>}
             </div>
           </div>

@@ -2,8 +2,8 @@ import classNames from "classnames";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 
-import { DeepgramContextProvider } from "./context/DeepgramContextProvider";
-import { MicrophoneContextProvider } from "./context/MicrophoneContextProvider";
+import { DeepgramContextProvider } from "../context/DeepgramContextProvider";
+import { MicrophoneContextProvider } from "../context/MicrophoneContextProvider";
 
 import "./globals.css";
 
@@ -11,7 +11,7 @@ import type { Metadata, Viewport } from "next";
 
 const inter = Inter({ subsets: ["latin"] });
 const favorit = localFont({
-  src: "./fonts/ABCFavorit-Bold.woff2",
+  src: "../../public/fonts/ABCFavorit-Bold.woff2",
   variable: "--font-favorit",
 });
 
