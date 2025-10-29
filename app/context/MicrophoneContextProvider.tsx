@@ -2,19 +2,19 @@
 
 import {
   createContext,
+  type ReactNode,
   useCallback,
   useContext,
   useState,
-  ReactNode,
 } from "react";
 
-interface MicrophoneContextType {
+type MicrophoneContextType = {
   microphone: MediaRecorder | null;
   startMicrophone: () => void;
   stopMicrophone: () => void;
   setupMicrophone: () => void;
   microphoneState: MicrophoneState | null;
-}
+};
 
 export enum MicrophoneEvents {
   DataAvailable = "dataavailable",
@@ -40,9 +40,9 @@ const MicrophoneContext = createContext<MicrophoneContextType | undefined>(
   undefined
 );
 
-interface MicrophoneContextProviderProps {
+type MicrophoneContextProviderProps = {
   children: ReactNode;
-}
+};
 
 const MicrophoneContextProvider: React.FC<MicrophoneContextProviderProps> = ({
   children,
@@ -63,11 +63,11 @@ const MicrophoneContextProvider: React.FC<MicrophoneContextProviderProps> = ({
         },
       });
 
-      const microphone = new MediaRecorder(userMedia);
+      const newMicrophone = new MediaRecorder(userMedia);
 
       setMicrophoneState(MicrophoneState.Ready);
-      setMicrophone(microphone);
-    } catch (err: any) {
+      setMicrophone(newMicrophone);
+    } catch (err: unknown) {
       console.error(err);
 
       throw err;

@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 const corsOptions: {
   allowedMethods: string[];
@@ -14,9 +14,9 @@ const corsOptions: {
   exposedHeaders: (process.env?.EXPOSED_HEADERS || "").split(","),
   maxAge:
     (process.env?.PREFLIGHT_MAX_AGE &&
-      parseInt(process.env?.PREFLIGHT_MAX_AGE)) ||
+      Number.parseInt(process.env?.PREFLIGHT_MAX_AGE, 10)) ||
     undefined, // 60 * 60 * 24 * 30, // 30 days
-  credentials: process.env?.CREDENTIALS == "true",
+  credentials: process.env?.CREDENTIALS === "true",
 };
 
 /**
@@ -32,7 +32,7 @@ const corsOptions: {
  * The middleware function is configured to be applied to all API routes, as defined
  * by the `config` object at the end of the file.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Response
   const response = NextResponse.next();
 

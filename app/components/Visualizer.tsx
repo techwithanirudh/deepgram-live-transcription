@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 const interpolateColor = (
   startColor: number[],
@@ -20,18 +20,20 @@ const Visualizer = ({ microphone }: { microphone: MediaRecorder }) => {
   const analyser = audioContext.createAnalyser();
   const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
     const source = audioContext.createMediaStreamSource(microphone.stream);
     source.connect(analyser);
 
     draw();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const draw = (): void => {
     const canvas = canvasRef.current;
 
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
 
     canvas.style.width = "100%";
     canvas.style.height = "100%";
@@ -46,7 +48,9 @@ const Visualizer = ({ microphone }: { microphone: MediaRecorder }) => {
 
     analyser.getByteFrequencyData(dataArray);
 
-    if (!context) return;
+    if (!context) {
+      return;
+    }
 
     context.clearRect(0, 0, width, height);
 
@@ -68,7 +72,7 @@ const Visualizer = ({ microphone }: { microphone: MediaRecorder }) => {
     }
   };
 
-  return <canvas ref={canvasRef} width={window.innerWidth}></canvas>;
+  return <canvas ref={canvasRef} width={window.innerWidth} />;
 };
 
 export default Visualizer;

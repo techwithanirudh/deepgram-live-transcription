@@ -1,3 +1,1 @@
-export const ExclamationIcon = () => {
-  return <>⚠️</>;
-};
+export const ExclamationIcon = () => <>⚠️</>;

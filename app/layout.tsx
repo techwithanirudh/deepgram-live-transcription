@@ -1,5 +1,5 @@
-import { Inter } from "next/font/google";
 import classNames from "classnames";
+import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 
 import { DeepgramContextProvider } from "./context/DeepgramContextProvider";
@@ -38,9 +38,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-dvh">
+    <html className="h-dvh" lang="en">
       <body
-        className={`h-full dark ${classNames(
+        className={`dark h-full ${classNames(
           favorit.variable,
           inter.className
         )}`}

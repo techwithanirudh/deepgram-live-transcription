@@ -1,5 +1,5 @@
-import { DeepgramError, createClient } from "@deepgram/sdk";
-import { NextResponse, type NextRequest } from "next/server";
+import { createClient, DeepgramError } from "@deepgram/sdk";
+import { type NextRequest, NextResponse } from "next/server";
 
 export const revalidate = 0;
 
@@ -15,11 +15,11 @@ export async function GET(request: NextRequest) {
   const url = request.url;
   const deepgram = createClient(process.env.DEEPGRAM_API_KEY ?? "");
 
-  let { result: tokenResult, error: tokenError } =
+  const { result: tokenResult, error: tokenError } =
     await deepgram.auth.grantToken();
 
   if (tokenError) {
-      return NextResponse.json(tokenError);
+    return NextResponse.json(tokenError);
   }
 
   if (!tokenResult) {

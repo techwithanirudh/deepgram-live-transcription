@@ -1,0 +1,25 @@
+pre-commit:
+  jobs:
+    check:
+      run: bun x ultracite fix
+      glob: 
+        - "*.js"
+        - "*.jsx"
+        - "*.ts"
+        - "*.tsx"
+        - "*.json"
+        - "*.jsonc"
+        - "*.css"
+      stage_fixed: true
+    typecheck:
+      run: bun typecheck
+
+post-merge:
+  commands:
+    install-deps:
+      run: bun i
+
+commit-msg:
+  commands:
+    'lint commit message':
+      run: bun commitlint --edit {1}
