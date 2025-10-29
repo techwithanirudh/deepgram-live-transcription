@@ -1,30 +1,27 @@
 "use client";
 
-import Image from "next/image";
+import { ModeToggle } from "@/components/mode-toggle";
 import App from "../components/App";
 
 const Home = () => {
+  const title = "Deepgram AI";
+
   return (
-    <div className="h-full overflow-hidden">
-      {/* height 4rem */}
-      <div className="flex h-16 items-center bg-linear-to-b from-black/50 to-black/10 backdrop-blur-[2px]">
-        <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 md:px-6 lg:px-8">
+    <div className="flex min-h-svh flex-col overflow-hidden">
+      <div className="flex h-16 items-center border-b bg-muted">
+        <header className="mx-auto flex w-full items-center justify-between px-4 md:px-6 lg:px-8">
           <div>
-            <a className="flex items-center" href="/">
-              <Image
-                alt="Deepgram Logo"
-                className="h-8 w-auto max-w-50 sm:max-w-none"
-                height={0}
-                priority
-                src="/deepgram.svg"
-                width={0}
-              />
+            <a className="flex items-center font-bold text-xl" href="/">
+              {title}
             </a>
+          </div>
+          <div>
+            <ModeToggle />
           </div>
         </header>
       </div>
 
-      <main className="-mb-16 mx-auto h-[calc(100%-4rem)] px-4 md:px-6 lg:px-8">
+      <main className="flex-1">
         <App />
       </main>
     </div>

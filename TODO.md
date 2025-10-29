@@ -1,0 +1,2 @@
+- use all snake case
+- use all tailwind v4 directive

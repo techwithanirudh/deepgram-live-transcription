@@ -1,18 +1,21 @@
-import classNames from "classnames";
-import { Inter } from "next/font/google";
-import localFont from "next/font/local";
+import { Geist, Geist_Mono } from "next/font/google";
 
 import { DeepgramContextProvider } from "../context/DeepgramContextProvider";
 import { MicrophoneContextProvider } from "../context/MicrophoneContextProvider";
 
-import "./globals.css";
+import "@/styles/globals.css";
 
 import type { Metadata, Viewport } from "next";
+import { ThemeProvider } from "@/context/ThemeProvider";
 
-const inter = Inter({ subsets: ["latin"] });
-const favorit = localFont({
-  src: "../../public/fonts/ABCFavorit-Bold.woff2",
-  variable: "--font-favorit",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export const viewport: Viewport = {
@@ -38,16 +41,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html className="h-dvh" lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head />
       <body
-        className={`dark h-full ${classNames(
-          favorit.variable,
-          inter.className
-        )}`}
+        className={`${geistSans.variable} ${geistMono.variable} flex min-h-svh flex-col antialiased`}
       >
-        <MicrophoneContextProvider>
-          <DeepgramContextProvider>{children}</DeepgramContextProvider>
-        </MicrophoneContextProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          disableTransitionOnChange
+          enableSystem
+        >
+          <MicrophoneContextProvider>
+            <DeepgramContextProvider>{children}</DeepgramContextProvider>
+          </MicrophoneContextProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

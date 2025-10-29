@@ -15,9 +15,7 @@ import {
 import Visualizer from "./Visualizer";
 
 const App: React.FC = () => {
-  const [caption, setCaption] = useState<string | undefined>(
-    "Powered by Deepgram"
-  );
+  const [caption, setCaption] = useState<string | undefined>();
   const { connection, connectToDeepgram, connectionState } = useDeepgram();
   const { setupMicrophone, microphone, startMicrophone, microphoneState } =
     useMicrophone();
@@ -132,15 +130,12 @@ const App: React.FC = () => {
   }, [microphoneState, connectionState]);
 
   return (
-    <div className="flex h-full antialiased">
-      <div className="flex h-full w-full flex-row overflow-x-hidden">
-        <div className="flex h-full flex-auto flex-col">
-          {/* height 100% minus 8rem */}
-          <div className="relative h-full w-full">
-            {microphone && <Visualizer microphone={microphone} />}
-            <div className="absolute inset-x-0 bottom-32 mx-auto max-w-4xl text-center">
-              {caption && <span className="bg-black/70 p-8">{caption}</span>}
-            </div>
+    <div className="flex h-[calc(100svh-theme(spacing.16))] w-full flex-row overflow-x-hidden">
+      <div className="flex h-full flex-auto flex-col">
+        <div className="relative h-full w-full">
+          {microphone && <Visualizer microphone={microphone} />}
+          <div className="absolute inset-x-0 bottom-0 flex h-16 w-full items-center justify-center border-t bg-muted text-center text-muted-foreground transition-opacity duration-300 empty:opacity-0">
+            {caption && <span className="rounded-xl">{caption}</span>}
           </div>
         </div>
       </div>

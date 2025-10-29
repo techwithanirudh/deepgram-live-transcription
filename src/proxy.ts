@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { env } from "@/env";
 
 const corsOptions: {
   allowedMethods: string[];
@@ -8,15 +9,14 @@ const corsOptions: {
   maxAge?: number;
   credentials: boolean;
 } = {
-  allowedMethods: (process.env?.ALLOWED_METHODS || "").split(","),
-  allowedOrigins: (process.env?.ALLOWED_ORIGIN || "").split(","),
-  allowedHeaders: (process.env?.ALLOWED_HEADERS || "").split(","),
-  exposedHeaders: (process.env?.EXPOSED_HEADERS || "").split(","),
-  maxAge:
-    (process.env?.PREFLIGHT_MAX_AGE &&
-      Number.parseInt(process.env?.PREFLIGHT_MAX_AGE, 10)) ||
-    undefined, // 60 * 60 * 24 * 30, // 30 days
-  credentials: process.env?.CREDENTIALS === "true",
+  allowedMethods: env.ALLOWED_METHODS ?? [],
+  allowedOrigins: env.ALLOWED_ORIGIN ?? [],
+  allowedHeaders: env.ALLOWED_HEADERS ?? [],
+  exposedHeaders: env.EXPOSED_HEADERS ?? [],
+  maxAge: env.PREFLIGHT_MAX_AGE
+    ? Number.parseInt(env.PREFLIGHT_MAX_AGE, 10)
+    : undefined, // 60 * 60 * 24 * 30, // 30 days
+  credentials: env.CREDENTIALS === "true",
 };
 
 /**
