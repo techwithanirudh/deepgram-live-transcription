@@ -53,24 +53,49 @@ const DeepgramContextProvider: FunctionComponent<
    * @returns A Promise that resolves when the connection is established.
    */
   const connectToDeepgram = async (options: LiveSchema, endpoint?: string) => {
-    const token = await getToken();
-    const deepgram = createClient({ accessToken: token });
+    if (
+      connectionState === SOCKET_STATES.connecting ||
+      connectionState === SOCKET_STATES.open ||
+      connectionState === SOCKET_STATES.closing
+    ) {
+      return;
+    }
 
-    const conn = deepgram.listen.live(options, endpoint);
+    setConnectionState(SOCKET_STATES.connecting);
 
-    conn.addListener(LiveTranscriptionEvents.Open, () => {
-      setConnectionState(SOCKET_STATES.open);
-    });
+    try {
+      const token = await getToken();
+      const deepgram = createClient({ accessToken: token });
 
-    conn.addListener(LiveTranscriptionEvents.Close, () => {
+      const conn = deepgram.listen.live(options, endpoint);
+
+      conn.addListener(LiveTranscriptionEvents.Open, () => {
+        setConnectionState(SOCKET_STATES.open);
+      });
+
+      conn.addListener(LiveTranscriptionEvents.Close, () => {
+        setConnectionState(SOCKET_STATES.closed);
+        setConnection(null);
+      });
+
+      conn.addListener(LiveTranscriptionEvents.Error, () => {
+        setConnectionState(SOCKET_STATES.closed);
+        setConnection(null);
+      });
+
+      setConnection(conn);
+    } catch (err) {
       setConnectionState(SOCKET_STATES.closed);
-    });
-
-    setConnection(conn);
+      setConnection(null);
+      throw err;
+    }
   };
 
   const disconnectFromDeepgram = () => {
     if (connection) {
+      if (connectionState !== SOCKET_STATES.closed) {
+        setConnectionState(SOCKET_STATES.closing);
+      }
       connection.requestClose();
       setConnection(null);
     }

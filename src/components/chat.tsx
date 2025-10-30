@@ -17,15 +17,9 @@ import Visualizer from "./visualizer";
 const App: React.FC = () => {
   const [caption, setCaption] = useState<string | undefined>();
   const { connection, connectionState } = useDeepgram();
-  const { setupMicrophone, microphone, startMicrophone, microphoneState } =
-    useMicrophone();
+  const { microphone, startMicrophone, microphoneState } = useMicrophone();
   const captionTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const keepAliveInterval = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
-  useEffect(() => {
-    setupMicrophone();
-  }, []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
@@ -71,7 +65,6 @@ const App: React.FC = () => {
     }
 
     return () => {
-      // prettier-ignore
       connection.removeListener(
         LiveTranscriptionEvents.Transcript,
         onTranscript

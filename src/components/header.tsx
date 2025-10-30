@@ -14,6 +14,8 @@ import {
 
 const makeLabel = (state: MicrophoneStateValue | null): string => {
   switch (state) {
+    case MicrophoneState.NotSetup:
+      return "Start Transcription";
     case MicrophoneState.Open:
       return "Stop Transcription";
     case MicrophoneState.Paused:
@@ -33,7 +35,13 @@ const makeLabel = (state: MicrophoneStateValue | null): string => {
 };
 
 function Header({ title }: { title: string }) {
-  const { microphoneState, startMicrophone, stopMicrophone } = useMicrophone();
+  const {
+    microphone,
+    microphoneState,
+    setupMicrophone,
+    startMicrophone,
+    stopMicrophone,
+  } = useMicrophone();
   const { connectionState, connectToDeepgram, disconnectFromDeepgram } =
     useDeepgram();
 
@@ -43,7 +51,8 @@ function Header({ title }: { title: string }) {
   const isInteractable =
     microphoneState === MicrophoneState.Ready ||
     microphoneState === MicrophoneState.Paused ||
-    microphoneState === MicrophoneState.Open;
+    microphoneState === MicrophoneState.Open ||
+    microphoneState === MicrophoneState.NotSetup;
   const isTransitioning =
     microphoneState === MicrophoneState.Opening ||
     microphoneState === MicrophoneState.Pausing ||
@@ -56,6 +65,16 @@ function Header({ title }: { title: string }) {
       stopMicrophone();
       disconnectFromDeepgram();
       return;
+    }
+
+    if (!microphone) {
+      try {
+        await setupMicrophone();
+      } catch (err) {
+        // biome-ignore lint/suspicious/noConsole: troubleshooting path
+        console.error("Unable to access the microphone", err);
+        return;
+      }
     }
 
     if (connectionState === SOCKET_STATES.open) {
